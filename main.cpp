@@ -16,10 +16,12 @@ int main(int argc, char *argv[])
     if (engine.rootObjects().isEmpty())
         return -1;
 
-    Backend backend;
+
+    Backend backend(&engine);
     engine.rootContext()->setContextProperty("backend", &backend);
 
     SocketHandler handle;
+
     /*if(!handle.bindSocket(39978))
     {
         qDebug() << "COULD NOT BIND SOCKET" << '\n';

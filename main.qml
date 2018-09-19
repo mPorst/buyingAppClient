@@ -2,26 +2,50 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 ApplicationWindow {
+    objectName: "mainWindow"
     visible: true
-    width: 640
-    height: 480
-    title: qsTr("Tabs")
+    width: 480
+    height: 640
+    title: qsTr("buying app")
 
     SwipeView {
+        objectName: "swipeView"
         id: swipeView
         anchors.fill: parent
         currentIndex: tabBar.currentIndex
 
         Page1Form {
+            nameField.onTextChanged: {
+                backend.setName(nameField.text)
+            }
 
             writeButton.onClicked: {
-                backend.initAndWriteSocket(price.text + '\n')
-                serverAnswer.text = backend.readSocket()
-                backend.closeSocket()
+                //backend.initAndWriteSocket("send purchase"+ '\n')
+                //backend.writeSocket()
+                backend.sendPurchase(price.text, nameField.text ,dateText.text, receiverField.text)
+            }
+            checkBox.onCheckedChanged: {
+                reverseButton.enabled = checkBox.checkState
+                //reverseButton.enabled(checkBox.checked)
+            }
+            reverseButton.onClicked: {
+                backend.removePurchase(nameField.text, dateText.text, receiverField.text)
+            }
+            eatenButton.onClicked: {
+                backend.sendConsumer(nameField.text, dateText.text, 'true')
             }
         }
 
         Page2Form {
+            balanceButton.onClicked: {
+                backend.getBalance()
+            }
+
+            summaryButton.onClicked: {
+                backend.getSummary()
+
+            }
+
 
         }
 
@@ -36,13 +60,13 @@ ApplicationWindow {
         currentIndex: swipeView.currentIndex
 
         TabButton {
-            text: qsTr("Page 1")
+            text: qsTr("Rechnung")
         }
         TabButton {
-            text: qsTr("Page 2")
+            text: qsTr("Übersicht")
         }
         TabButton {
-            text: qsTr("Page 3")
+            text: qsTr("Server")
         }
     }
 }

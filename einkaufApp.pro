@@ -15,7 +15,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     sockethandler.cpp \
-    backend.cpp
+    backend.cpp \
+    uiupdater.cpp
 
 #INCLUDEPATH += /home/moritz/Downloads/android-ndk-r17b/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/include
 
@@ -39,4 +40,5 @@ DISTFILES += \
 
 HEADERS += \
     sockethandler.h \
-    backend.h
+    backend.h \
+    uiupdater.h

@@ -2,6 +2,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 Page {
+    id: page
     width: 600
     height: 400
     property alias port: port
@@ -15,14 +16,13 @@ Page {
 
     Label {
         id: hostLabel
+        x: 34
+        y: 40
         text: qsTr("Server domain/IP")
-        anchors.verticalCenterOffset: -131
-        anchors.horizontalCenterOffset: -213
         font.pointSize: 10
-        anchors.centerIn: parent
     }
 
-    Text {
+    TextEdit {
         id: host
         x: 34
         y: 73
@@ -31,22 +31,18 @@ Page {
         color: "#ffffff"
         text: qsTr("palaven.de")
         font.family: "Times New Roman"
-        styleColor: "#ffffff"
         font.pixelSize: 22
     }
 
     Label {
         id: portLabel
-        x: 3
-        y: 3
+        x: 34
+        y: 138
         text: qsTr("port")
-        anchors.verticalCenterOffset: -32
-        anchors.horizontalCenterOffset: -253
-        anchors.centerIn: parent
         font.pointSize: 10
     }
 
-    Text {
+    TextEdit {
         id: port
         x: 34
         y: 173
@@ -56,6 +52,5 @@ Page {
         text: qsTr("39978")
         font.family: "Times New Roman"
         font.pixelSize: 22
-        styleColor: "#ffffff"
     }
 }
