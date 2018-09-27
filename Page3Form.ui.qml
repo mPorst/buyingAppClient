@@ -9,7 +9,7 @@ Page {
     property alias host: host
 
     header: Label {
-        text: qsTr("./Connection information")
+        text: qsTr("./Connection")
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
     }

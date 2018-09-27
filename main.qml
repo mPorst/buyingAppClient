@@ -20,16 +20,15 @@ ApplicationWindow {
             }
 
             writeButton.onClicked: {
-                //backend.initAndWriteSocket("send purchase"+ '\n')
-                //backend.writeSocket()
                 backend.sendPurchase(price.text, nameField.text ,dateText.text, receiverField.text)
+
             }
             checkBox.onCheckedChanged: {
                 reverseButton.enabled = checkBox.checkState
-                //reverseButton.enabled(checkBox.checked)
             }
             reverseButton.onClicked: {
                 backend.removePurchase(nameField.text, dateText.text, receiverField.text)
+                console.log("The reverse button was clicked")
             }
             eatenButton.onClicked: {
                 backend.sendConsumer(nameField.text, dateText.text, 'true')

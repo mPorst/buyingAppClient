@@ -1,61 +1,65 @@
 #include "backend.h"
-#include "sockethandler.h"
 
-Backend::Backend(QQmlApplicationEngine* newEngine, QObject *parent) : QObject(parent)
-{ // timer to update UI constantly
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Backend::updateUI);
-    timer->start(1000);
-
+Backend::Backend(QQmlApplicationEngine* newEngine, QThread* newMainThread, QObject *parent) : QObject(parent)
+{
     engine = newEngine;
     qmlRootObject = engine->rootObjects().first();
-}
+    mainThread = newMainThread;
 
-void Backend::initSocket()
-{
-    if(!handle.bindSocket(port))
-    {
-        qDebug() << "Could not bind socket!\n"; return;
-    }
-}
+    // timer to update UI constantly
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Backend::updateUI);
+    //connect(timer, &QTimer::timeout, mythread, &QThread::start);
+    timer->start(2000);
 
-void Backend::writeSocket(QString data)
-{
-    handle.connectToHost(domain, port);
-    //qDebug() << "connected to: " << domain << " and " << port << '\n';
-    handle.writeSocket(data);
-    qDebug() << "Wrote data: " << data << '\n';
-}
+    //set up the comms object for server communication
+    comms = new CommunicationProtocol(mainThread);
+    comms->setDomain(domain);
+    comms->setPort(port);
 
-QString Backend::readSocket()
-{
-    return handle.readSocket();
-}
+    //set up a new thread
+    mythread = new QThread();
 
-void Backend::initAndWriteSocket(QString data)
-{
-    if(isInitialised() == false)
-    {
-        initSocket();
-        initialised=true;
-        qDebug() << "Initialised socket \n";
-    }
-    writeSocket(data);
-}
+    mainThread->setObjectName("mainThread");
+    mythread->setObjectName("updateThread");
 
-void Backend::closeSocket()
-{
-    handle.closeSocket();
+    QObject::connect(timer, &QTimer::destroyed, this, &Backend::dummyFunction);
+    QObject::connect(timer, &QTimer::timeout, this, &Backend::updateUI);
+    // connections for updateUI
+    QObject::connect(mythread, &QThread::started, this, &Backend::getConsumer);
+    QObject::connect(this, &Backend::updateEaten, comms, &CommunicationProtocol::getConsumer);
+    QObject::connect(comms, &CommunicationProtocol::gotConsumer, mythread, &QThread::quit);
+    QObject::connect(comms, &CommunicationProtocol::gotConsumer, this, &Backend::updateCheckbox);
+    //QObject::connect(mythread, SIGNAL(finished()), mythread, SLOT(deleteLater()));
+
+    /// connections for other server communication
+    // sendPurchase
+    QObject::connect(this, &Backend::sendPurchaseSignal, comms, &CommunicationProtocol::sendPurchase);
+    QObject::connect(comms, &CommunicationProtocol::sentPurchase, this, &Backend::updateMainTextbox );
+    //removePurchase
+    QObject::connect(this, &Backend::removePurchaseSignal, comms, &CommunicationProtocol::removePurchase);
+    QObject::connect(comms, &CommunicationProtocol::removedPurchase, this, &Backend::updateMainTextbox );
+    //sendConsumer
+    QObject::connect(this, &Backend::sendConsumerSignal, comms, &CommunicationProtocol::sendConsumer);
+    QObject::connect(comms, &CommunicationProtocol::sentConsumer, this, &Backend::updateMainTextbox );
+    //getSummary
+    QObject::connect(this, &Backend::getSummarySignal, comms, &CommunicationProtocol::getSummary);
+    QObject::connect(comms, &CommunicationProtocol::gotSummary, this, &Backend::updateSummaryTextbox);
+    //removePurchase
+    QObject::connect(this, &Backend::getBalanceSignal, comms, &CommunicationProtocol::getBalance);
+    QObject::connect(comms, &CommunicationProtocol::gotBalance, this, &Backend::updateSummaryTextbox);
 }
 
 void Backend::setPort(quint16 newPort)
 {
     port = newPort;
+    comms->setPort(port);
 }
 
 void Backend::setDomain(QString newDomain)
 {
     domain = newDomain;
+    comms->setDomain(domain);
 }
 
 void Backend::setName(QString newName)
@@ -63,216 +67,124 @@ void Backend::setName(QString newName)
     name = newName;
 }
 
-bool Backend::isInitialised()
-{
-    return initialised;
-}
 
 void Backend::updateUI(){
-    QObject *dateLabel = qmlRootObject->findChild<QObject*>("dateTextObject");
     QString today = QDate::currentDate().toString();
+    QObject *dateLabel = qmlRootObject->findChild<QObject*>("dateTextObject");
     if(dateLabel != nullptr)
         dateLabel->setProperty("text", QDate::currentDate());
     else
         qDebug() << "Could not find the date text field. \n";
-    getConsumer(name, today);
+
+    comms->moveToThread(mythread);
+
+    mythread->start();
+    return;
 }
 
 bool Backend::sendPurchase(QString price, QString buyer, QString date, QString receiver)
 {
-    initAndWriteSocket("send purchase\n");
-    QThread::msleep(50);
-    QObject* answer = qmlRootObject->findChild<QObject*>("serverAnswerAreaObject");
-
-    if(answer == nullptr)
-    {
-        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
-        return false;
-    }
-
-    if(readSocket() != "ack\n")
-    {
-        qDebug() << "Entering != ack case \n";
-        closeSocket();
-        answer->setProperty("text", "Server error, did not send data");
-        return false; // server didn't answer
-    }
-
-    answer->setProperty("text", "ack");
-    QThread::msleep(50);
-    initAndWriteSocket(buyer.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(date.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(price.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(receiver.append("\n"));
-    answer->setProperty("text", readSocket());
-    closeSocket();
+    // the actual server communication is done in the comms object
+    //QString serverAnswer = comms->sendPurchase(price, buyer, date, receiver);
+    emit sendPurchaseSignal(price, buyer, date, receiver);
+    //answer->setProperty("text", serverAnswer);
     return true;
 }
 
 bool Backend::removePurchase(QString buyer, QString date, QString receiver)
 {
-    initAndWriteSocket("remove purchase\n");
-    QThread::msleep(50);
-    QObject* answer = qmlRootObject->findChild<QObject*>("serverAnswerAreaObject");
-
-    if(answer == nullptr)
-    {
-        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
-        return false;
-    }
-
-    if(readSocket() != "ack\n")
-    {
-        qDebug() << "Entering != ack case \n";
-        closeSocket();
-        answer->setProperty("text", "Server error, did not send data");
-        return false; // server didn't answer
-    }
-
-    answer->setProperty("text", "ack");
-    QThread::msleep(50);
-    initAndWriteSocket(buyer.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(date.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(receiver.append("\n"));
-    answer->setProperty("text", readSocket());
-    closeSocket();
+    emit removePurchaseSignal(buyer, date, receiver);
     return true;
 }
 
 bool Backend::getBalance()
 {
-    initAndWriteSocket("get balance\n");
-    QThread::msleep(50);
-    QObject* answer = qmlRootObject->findChild<QObject*>("serverAnswerSummaryAreaObject");
-    QString buyer = name;
-
-    if(answer == nullptr)
-    {
-        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
-        return false;
-    }
-
-    if(readSocket() != "ack\n")
-    {
-        qDebug() << "Entering != ack case \n";
-        closeSocket();
-        answer->setProperty("text", "Server error, did not send data");
-        return false; // server didn't answer
-    }
-
-    initAndWriteSocket(buyer.append("\n"));
-    answer->setProperty("text", readSocket());
-    closeSocket();
+    emit getBalanceSignal(name);
     return true;
 }
 
 bool Backend::getSummary()
 {
-    initAndWriteSocket("get summary\n");
-    QThread::msleep(50);
-    QObject* answer = qmlRootObject->findChild<QObject*>("serverAnswerSummaryAreaObject");
-    QString serverResponse;
-
-    if(answer == nullptr)
-    {
-        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
-        return false;
-    }
-
-    QString mystr = readSocket();
-    if(mystr != "ack\n")
-    {
-        qDebug() << "Entering != ack case, received " << mystr << " \n";
-        closeSocket();
-        answer->setProperty("text", "Server error, did not send data");
-        return false; // server didn't answer
-    }
-
-    for(int i=0; i<12; i++)
-    {
-        serverResponse.append(readSocket());
-    }
-    qDebug() << serverResponse;
-    answer->setProperty("text", serverResponse);
-    closeSocket();
+    emit getSummarySignal();
     return true;
 }
 
 bool Backend::sendConsumer(QString consumer, QString date, QString hasEaten)
 {
-    initAndWriteSocket("send consumer\n");
-    QThread::msleep(50);
-    QObject* answer = qmlRootObject->findChild<QObject*>("serverAnswerAreaObject");
-    if(answer == nullptr)
-    {
-        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
-        return false;
-    }
-    if(readSocket() != "ack\n")
-    {
-        qDebug() << "Entering != ack case \n";
-        closeSocket();
-        answer->setProperty("text", "Server error, did not send data");
-        return false; // server didn't answer
-    }
-
-    answer->setProperty("text", "ack");
-    QThread::msleep(50);
-    initAndWriteSocket(consumer.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(date.append("\n"));
-    QThread::msleep(50);
-    initAndWriteSocket(hasEaten.append("\n"));
-    answer->setProperty("text", readSocket());
-    closeSocket();
+    emit sendConsumerSignal(consumer, date, hasEaten);
     return true;
 }
 
-bool Backend::getConsumer(QString consumer, QString date)
+bool Backend::getConsumer()
 {
-    initAndWriteSocket("get consumer\n");
-    QThread::msleep(50);
-    QObject* checkbox = qmlRootObject->findChild<QObject*>("eatenCheckboxObject");
-    QObject* answer = qmlRootObject->findChild<QObject*>("serverAnswerAreaObject");
-
-    if(answer == nullptr)
-    {
-        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
-        return false;
-    }
-    if(checkbox == nullptr)
-    {
-        qDebug() << "eatenCheckboxObject was not found. PANIC !!! \n";
-        return false;
-    }
-
-    if(readSocket() != "ack\n")
-    {
-        qDebug() << "Entering != ack case \n";
-        closeSocket();
-        answer->setProperty("text", "Can't reach server on regular UI update");
-        return false; // server didn't answer
-    }
-
-    QThread::msleep(30);
-    initAndWriteSocket(consumer.append("\n"));
-    QThread::msleep(30);
-    initAndWriteSocket(date.append("\n"));
-    QString answerFromServer = readSocket();
-    if(answerFromServer == "true")
-    {
-        checkbox->setProperty("checked", true);
-    }
-    else if(answerFromServer == "false")
-    {
-        checkbox->setProperty("checked", false);
-    }
-    closeSocket();
+    QString date = QDate::currentDate().toString(Qt::ISODate);
+    // the signal updateEaten() starts the method getConsumer in comms
+    qDebug() << "Emitting updateEaten...";
+    emit updateEaten(name, date);
+    qDebug() << "Emitted updateEaten...";
+    //QString serverAnswer = comms->getConsumer(consumer, date);
+    qDebug() << "Exiting getConsumer...";
     return true;
 }
 
+void Backend::updateProperty(QString objectname, QString property, QString newValue)
+{
+    QObject* toBeUpdated = qmlRootObject->findChild<QObject*>(objectname);
+
+    if(toBeUpdated == nullptr)
+    {
+        qDebug() << "serverAnswerObject was not found. PANIC !!! \n";
+        return;
+    }
+    toBeUpdated->setProperty(property.toStdString().c_str(), newValue);
+}
+
+void Backend::updateMainTextbox(QString text)
+{
+    qDebug() << "NOW UPDATING THE MAIN TEXT BOX";
+    QObject* toBeUpdated = qmlRootObject->findChild<QObject*>("serverAnswerAreaObject");
+
+    if(toBeUpdated == nullptr)
+    {
+        qDebug() << "serverAnswerObject was not found in updateMainTextbox. PANIC !!! \n";
+        return;
+    }
+    toBeUpdated->setProperty("text", text);
+}
+
+void Backend::updateSummaryTextbox(QString text)
+{
+    qDebug() << "NOW UPDATING THE SUMMARY TEXT BOX";
+    QObject* toBeUpdated = qmlRootObject->findChild<QObject*>("serverAnswerSummaryAreaObject");
+
+    if(toBeUpdated == nullptr)
+    {
+        qDebug() << "serverAnswerSummaryAreaObject was not found in updateMainTextbox. PANIC !!! \n";
+        return;
+    }
+    toBeUpdated->setProperty("text", text);
+}
+
+void Backend::updateCheckbox(QString value)
+{
+    qDebug() << "STARTING UPDATE CHECKBOX";
+    // the truncate operation removes the new line character from the end of the string
+    value.truncate(value.size()-1);
+    qDebug() << value << " was received";
+    if(value == "true" || value == "false")
+    {
+        updateProperty("eatenCheckboxObject", "checked", value);
+        return;
+    }
+    else
+    {
+        QString answer = "Server responded with an error: " + value;
+        updateProperty("serverAnswerAreaObject", "text", answer);
+        return;
+    }
+}
+
+void Backend::dummyFunction()
+{
+    qDebug("THE TIMER WAS KILLED!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+}

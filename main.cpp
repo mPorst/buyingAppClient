@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
 
 
     QGuiApplication app(argc, argv);
+    qDebug() << "The main thread is: " << app.thread();
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
@@ -17,19 +18,9 @@ int main(int argc, char *argv[])
         return -1;
 
 
-    Backend backend(&engine);
+    Backend backend(&engine, (&app)->thread());
+    QThread::msleep(200);
     engine.rootContext()->setContextProperty("backend", &backend);
-
-    SocketHandler handle;
-
-    /*if(!handle.bindSocket(39978))
-    {
-        qDebug() << "COULD NOT BIND SOCKET" << '\n';
-        exit(1);
-    }*/
-    //handle.connectToHost("palaven.de", 39978);
-    //handle.writeSocket("lalalalalallalalalala\n");
-    //qDebug() << handle.readSocket();
 
     return app.exec();
 }

@@ -3,13 +3,14 @@
 SocketHandler::SocketHandler()
 {
     int tempCounter = 0;
+    qDebug() << "DEBUG in sockethandler constructor ";
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses())
     {
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
         {
             tempCounter += 1;
             myAddress = address;
-            qDebug() << "The address to bind is " << address;
+            qDebug() << "The address to bind is " << myAddress;
         }
     }
 
@@ -20,7 +21,7 @@ bool SocketHandler::bindSocket(quint16 port)
 {
     if(socket.bind(serverAddress, port))
         return true;
-    qDebug()<< "Socket error: " << socket.error();
+    qDebug()<< "Could not bind socket: " << socket.error();
     return false;
 }
 
@@ -55,5 +56,4 @@ QString SocketHandler::readSocket()
 void SocketHandler::closeSocket()
 {
     socket.disconnectFromHost();
-    qDebug() << "Closing socket in SocketHandler ! \n";
 }
