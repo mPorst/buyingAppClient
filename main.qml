@@ -28,7 +28,6 @@ ApplicationWindow {
             }
             reverseButton.onClicked: {
                 backend.removePurchase(nameField.text, dateText.text, receiverField.text)
-                console.log("The reverse button was clicked")
             }
             eatenButton.onClicked: {
                 backend.sendConsumer(nameField.text, dateText.text, 'true')
@@ -36,21 +35,14 @@ ApplicationWindow {
         }
 
         Page2Form {
-            balanceButton.onClicked: {
-                backend.getBalance()
-            }
-
-            summaryButton.onClicked: {
-                backend.getSummary()
-
-            }
-
-
+            balanceButton.onClicked: {backend.getBalance()}
+            summaryButton.onClicked: {backend.getSummary()}
         }
 
         Page3Form{
             port.onTextChanged: {backend.setPort(port.text)}
             host.onTextChanged: {backend.setDomain(host.text)}
+            updateSwitch.onCheckedChanged: {backend.switchUpdate(updateSwitch.checked)}
         }
     }
 

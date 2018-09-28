@@ -26,6 +26,7 @@ public slots:
     void setDomain(QString newDomain);
     void setName(QString newName);
     void updateUI();
+    void switchUpdate(bool value);
 
     // just call the corresponding methods of CommunicationProtocol
     bool sendPurchase(QString price, QString buyer, QString date, QString receiver);

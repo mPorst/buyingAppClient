@@ -188,3 +188,11 @@ void Backend::dummyFunction()
 {
     qDebug("THE TIMER WAS KILLED!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 }
+
+void Backend::switchUpdate(bool value)
+{
+   if(value == true)
+       timer->start(2000);
+   else
+       timer->stop();
+}

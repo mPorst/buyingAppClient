@@ -3,10 +3,11 @@ import QtQuick.Controls 2.4
 
 Page {
     id: page
-    width: 600
-    height: 400
+    width: 400
+    height: 600
     property alias port: port
     property alias host: host
+    property alias updateSwitch: updateSwitch
 
     header: Label {
         text: qsTr("./Connection")
@@ -52,5 +53,14 @@ Page {
         text: qsTr("39978")
         font.family: "Times New Roman"
         font.pixelSize: 22
+    }
+
+    Switch {
+        id: updateSwitch
+        objectName: "updateSwitchObject"
+        x: 34
+        y: 258
+        text: qsTr("automatic UI update")
+        checked: true
     }
 }

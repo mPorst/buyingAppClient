@@ -101,7 +101,7 @@ Page {
         text: qsTr("Serverantwort")
     }
 
-    Text {
+    TextEdit {
         id: dateText
         objectName: "dateTextObject"
         x: 152

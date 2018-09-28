@@ -62,11 +62,13 @@ QString CommunicationProtocol::sendPurchase(QString price, QString buyer, QStrin
 {
     writeSocket("send purchase\n");
     QThread::msleep(50);
+    QString answerFromServer = readSocket();
 
-    if(readSocket() != "ack\n")
+    if(answerFromServer != "ack\n")
     {
-        qDebug() << "Entering != ack case \n";
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
+        emit sentPurchase("Server sent \"" + answerFromServer +"\"\n");
         return "Server communication error"; // server didn't answer
     }
 
@@ -78,7 +80,7 @@ QString CommunicationProtocol::sendPurchase(QString price, QString buyer, QStrin
     writeSocket(price.append("\n"));
     QThread::msleep(50);
     writeSocket(receiver.append("\n"));
-    QString answerFromServer = readSocket();
+    answerFromServer = readSocket();
     closeSocket();
     emit sentPurchase(answerFromServer);
     return answerFromServer;
@@ -88,10 +90,13 @@ QString CommunicationProtocol::removePurchase(QString buyer, QString date, QStri
     writeSocket("remove purchase\n");
     QThread::msleep(50);
 
-    if(readSocket() != "ack\n")
+    QString answerFromServer = readSocket();
+
+    if(answerFromServer != "ack\n")
     {
-        qDebug() << "Entering != ack case \n";
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
+        emit removedPurchase("Server sent \"" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -101,7 +106,7 @@ QString CommunicationProtocol::removePurchase(QString buyer, QString date, QStri
     writeSocket(date.append("\n"));
     QThread::msleep(50);
     writeSocket(receiver.append("\n"));
-    QString answerFromServer = readSocket();
+    answerFromServer = readSocket();
     closeSocket();
     emit removedPurchase(answerFromServer);
     return answerFromServer;
@@ -112,18 +117,21 @@ QString CommunicationProtocol::getBalance(QString buyer)
     writeSocket("get balance\n");
     QThread::msleep(50);
 
-    if(readSocket() != "ack\n")
+    QString answerFromServer = readSocket();
+
+    if(answerFromServer != "ack\n")
     {
-        qDebug() << "Entering != ack case \n";
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
+        emit gotBalance("Server sent \"" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
     writeSocket(buyer.append("\n"));
-    QString serverAnswer = readSocket();
+    answerFromServer = readSocket();
     closeSocket();
-    emit gotBalance(serverAnswer);
-    return serverAnswer;
+    emit gotBalance(answerFromServer);
+    return answerFromServer;
 }
 
 QString CommunicationProtocol::getSummary()
@@ -132,11 +140,13 @@ QString CommunicationProtocol::getSummary()
     QThread::msleep(50);
     QString serverResponse;
 
-    QString mystr = readSocket();
-    if(mystr != "ack\n")
+    QString answerFromServer = readSocket();
+
+    if(answerFromServer != "ack\n")
     {
-        qDebug() << "Entering != ack case, received " << mystr << " \n";
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
+        emit gotSummary("Server sent \"" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -153,10 +163,14 @@ QString CommunicationProtocol::sendConsumer(QString consumer, QString date, QStr
 {
     writeSocket("send consumer\n");
     QThread::msleep(50);
-    if(readSocket() != "ack\n")
+
+    QString answerFromServer = readSocket();
+
+    if(answerFromServer != "ack\n")
     {
-        qDebug() << "Entering != ack case \n";
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
+        emit sentConsumer("Server sent \"" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -166,10 +180,10 @@ QString CommunicationProtocol::sendConsumer(QString consumer, QString date, QStr
     writeSocket(date.append("\n"));
     QThread::msleep(50);
     writeSocket(hasEaten.append("\n"));
-    QString serverAnswer = readSocket();
+    answerFromServer = readSocket();
     closeSocket();
-    emit sentConsumer(serverAnswer);
-    return serverAnswer;
+    emit sentConsumer(answerFromServer);
+    return answerFromServer;
 }
 
 QString CommunicationProtocol::getConsumer(QString consumer, QString date=QDate::currentDate().toString(Qt::ISODate))
@@ -177,12 +191,13 @@ QString CommunicationProtocol::getConsumer(QString consumer, QString date=QDate:
     writeSocket("get consumer\n");
     QThread::msleep(50);
 
-    if(readSocket() != "ack\n")
+    QString answerFromServer = readSocket();
+
+    if(answerFromServer != "ack\n")
     {
-        qDebug() << "Entering != ack case \n";
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        qDebug() << "Immediately before return \" cant reach server on regular UI update \" ";
-        emit gotConsumer("Server communication error\n");
+        emit gotConsumer("Server sent \"" + answerFromServer +"\"\n");
         return "Can't reach server on regular UI update";
     }
 
@@ -190,7 +205,7 @@ QString CommunicationProtocol::getConsumer(QString consumer, QString date=QDate:
     writeSocket(consumer.append("\n"));
     QThread::msleep(30);
     writeSocket(date.append("\n"));
-    QString answerFromServer = readSocket();
+    answerFromServer = readSocket();
     closeSocket();
     emit gotConsumer(answerFromServer);
     return answerFromServer;
