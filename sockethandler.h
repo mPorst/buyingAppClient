@@ -21,6 +21,7 @@ public:
     bool bindSocket(quint16 port);
     void connectToHost(QString hostname, quint16 port);
     bool writeSocket(QString message);
+    bool waitForReadyRead(int msecs);
     QString readSocket();
     void closeSocket();
 

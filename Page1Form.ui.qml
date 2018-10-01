@@ -31,7 +31,7 @@ Page {
         height: 32
         color: "#ffffff"
         text: qsTr("0.00")
-        cursorVisible: true
+        cursorVisible: false
         font.pixelSize: 22
     }
 
@@ -58,7 +58,7 @@ Page {
         color: "#ffffff"
         text: qsTr("Max Mustermann")
         font.pixelSize: 22
-        cursorVisible: true
+        cursorVisible: false
     }
 
     Label {
@@ -123,7 +123,7 @@ Page {
         color: "#ffffff"
         text: qsTr("none")
         font.pixelSize: 22
-        cursorVisible: true
+        cursorVisible: false
     }
 
     Label {

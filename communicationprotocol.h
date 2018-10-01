@@ -27,6 +27,7 @@ public slots:
     QString getSummary();
     QString sendConsumer(QString consumer, QString date, QString hasEaten);
     QString getConsumer(QString consumer, QString date);
+    QString getEaters(QString date);
     //QString getConsumer();
 
     // getters/setters
@@ -43,6 +44,7 @@ signals:
     void gotSummary(QString msg);
     void commsError(QString msg);
     void gotBalance(QString msg);
+    void gotEaters(QString msg);
 
 private:
     SocketHandler* handle;

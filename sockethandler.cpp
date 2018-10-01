@@ -17,6 +17,11 @@ SocketHandler::SocketHandler()
     //QObject::connect(this, &SocketHandler::connectedChanged, this, &SocketHandler::setConnected);
 }
 
+bool SocketHandler::waitForReadyRead(int msecs)
+{
+    return socket.waitForReadyRead(msecs);
+}
+
 bool SocketHandler::bindSocket(quint16 port)
 {
     if(socket.bind(serverAddress, port))

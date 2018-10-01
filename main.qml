@@ -21,11 +21,13 @@ ApplicationWindow {
             checkBox.onCheckedChanged: {reverseButton.enabled = checkBox.checkState}
             reverseButton.onClicked: {backend.removePurchase(nameField.text, dateText.text, receiverField.text)}
             eatenButton.onClicked: { backend.sendConsumer(nameField.text, dateText.text, !eatenCheckBox.checked)}
+            dateText.onTextChanged: {backend.setDate(dateText.text)}
         }
 
         Page2Form {
             balanceButton.onClicked: {backend.getBalance()}
             summaryButton.onClicked: {backend.getSummary()}
+            eatersButton.onClicked: {backend.getEaters()}
         }
 
         Page3Form{

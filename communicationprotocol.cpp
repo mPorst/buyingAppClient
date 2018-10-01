@@ -150,10 +150,27 @@ QString CommunicationProtocol::getSummary()
         return "Server error, did not send data";
     }
 
-    for(int i=0; i<12; i++)
+    //for(int i=0; i<12; i++)
+    QString answer;
+    do
     {
-        serverResponse.append(readSocket());
+        //if(!handle->waitForReadyRead(5000))
+        //{
+         //   qDebug() << "Breaking as waitForReadyRead was false";
+          //  break;
+        //}
+        answer = readSocket();
+        qDebug() << "Received message " << answer;
+        if(!serverResponse.isEmpty() && answer == "Socket read error")
+        {
+
+        }
+        else
+        {
+            serverResponse.append(answer);
+        }
     }
+    while(answer != "Socket read error");
     closeSocket();
     emit gotSummary(serverResponse);
     return serverResponse;
@@ -217,3 +234,39 @@ void CommunicationProtocol::checkThread()
              << QThread::currentThread() ;
 }
 
+QString CommunicationProtocol::getEaters(QString date)
+{
+    writeSocket("get eaters\n");
+    QThread::msleep(50);
+
+    QString answerFromServer = readSocket();
+    QString appendedAnswer;
+
+    if(answerFromServer != "ack\n")
+    {
+        qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
+        closeSocket();
+        emit gotEaters("Server sent \"" + answerFromServer +"\"\n");
+        return "Server error, did not send data";
+    }
+
+    QThread::msleep(10);
+    writeSocket(date.append("\n"));
+    do
+    {
+        QThread::msleep(30);
+        answerFromServer = readSocket();
+        qDebug() << "Server answered" << answerFromServer;
+        if(answerFromServer == "Socket read error" && !appendedAnswer.isEmpty())
+        {
+        }
+        else
+        {
+            appendedAnswer.append(answerFromServer);
+        }
+    }
+    while(answerFromServer != "Socket read error");
+    closeSocket();
+    emit gotEaters(appendedAnswer);
+    return appendedAnswer;
+}

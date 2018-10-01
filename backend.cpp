@@ -49,6 +49,9 @@ Backend::Backend(QQmlApplicationEngine* newEngine, QThread* newMainThread, QObje
     //removePurchase
     QObject::connect(this, &Backend::getBalanceSignal, comms, &CommunicationProtocol::getBalance);
     QObject::connect(comms, &CommunicationProtocol::gotBalance, this, &Backend::updateSummaryTextbox);
+    //getEaters
+    QObject::connect(this, &Backend::getEatersSignal, comms, &CommunicationProtocol::getEaters);
+    QObject::connect(comms, &CommunicationProtocol::gotEaters, this, &Backend::updateSummaryTextbox);
 
     comms->moveToThread(mythread);
     mythread->start();
@@ -198,4 +201,14 @@ void Backend::switchUpdate(bool value)
        timer->start(2000);
    else
        timer->stop();
+}
+
+void Backend::getEaters()
+{
+    emit getEatersSignal(date);
+}
+
+void Backend::setDate(QString newDate)
+{
+    date = newDate;
 }

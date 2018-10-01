@@ -8,6 +8,7 @@ Page {
     property alias balanceButton: balanceButton
     property alias summaryButton: summaryButton
     property alias serverAnswerSummaryArea: serverAnswerSummaryArea
+    property alias eatersButton: eatersButton
 
     header: Label {
         text: qsTr("./Übersicht")
@@ -58,5 +59,12 @@ Page {
         x: 14
         y: 78
         text: "Zusammenfassung"
+    }
+
+    Button {
+        id: eatersButton
+        x: 192
+        y: 18
+        text: qsTr("gegessen")
     }
 }

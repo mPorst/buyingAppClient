@@ -25,6 +25,7 @@ public slots:
     void setPort(quint16 newPort);
     void setDomain(QString newDomain);
     void setName(QString newName);
+    void setDate(QString date);
     void updateUI();
     void switchUpdate(bool value);
 
@@ -35,6 +36,7 @@ public slots:
     bool getSummary();
     bool sendConsumer(QString consumer, QString date, QString hasEaten);
     bool getConsumer();
+    void getEaters();
 
     // UI updating
     void updateProperty(QString objectname, QString property, QString newText);
@@ -55,6 +57,7 @@ signals:
     void sendConsumerSignal(QString consumer, QString date, QString hasEaten);
     void getSummarySignal();
     void getBalanceSignal(QString employee);
+    void getEatersSignal(QString date);
     void startGetConsumer();
 
 private:
@@ -64,6 +67,7 @@ private:
     quint16 port=39978;
     QString domain="palaven.de";
     QString name = "Max Mustermann";
+    QString date;
     CommunicationProtocol* comms;
     QThread* mainThread;
     QThread* mythread;
