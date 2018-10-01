@@ -55,6 +55,7 @@ signals:
     void sendConsumerSignal(QString consumer, QString date, QString hasEaten);
     void getSummarySignal();
     void getBalanceSignal(QString employee);
+    void startGetConsumer();
 
 private:
     QQmlApplicationEngine* engine;

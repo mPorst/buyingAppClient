@@ -14,7 +14,7 @@ Page {
     property alias reverseButton: reverseButton
     property alias checkBox: checkBox
     property alias eatenButton: eatenButton
-    property alias eatenCheckbox: eatenCheckbox
+    property alias eatenCheckBox: eatenCheckbox
 
     //    property alias dateTextField: dateText.text
     header: Label {

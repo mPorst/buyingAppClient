@@ -8,7 +8,7 @@ Backend::Backend(QQmlApplicationEngine* newEngine, QThread* newMainThread, QObje
 
     // timer to update UI constantly
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Backend::updateUI);
+    //connect(timer, &QTimer::timeout, this, &Backend::updateUI);
     //connect(timer, &QTimer::timeout, mythread, &QThread::start);
     timer->start(2000);
 
@@ -26,9 +26,10 @@ Backend::Backend(QQmlApplicationEngine* newEngine, QThread* newMainThread, QObje
     QObject::connect(timer, &QTimer::destroyed, this, &Backend::dummyFunction);
     QObject::connect(timer, &QTimer::timeout, this, &Backend::updateUI);
     // connections for updateUI
-    QObject::connect(mythread, &QThread::started, this, &Backend::getConsumer);
+    //QObject::connect(mythread, &QThread::started, this, &Backend::getConsumer);
+    QObject::connect(this, &Backend::startGetConsumer, this, &Backend::getConsumer);
     QObject::connect(this, &Backend::updateEaten, comms, &CommunicationProtocol::getConsumer);
-    QObject::connect(comms, &CommunicationProtocol::gotConsumer, mythread, &QThread::quit);
+    //QObject::connect(comms, &CommunicationProtocol::gotConsumer, mythread, &QThread::quit);
     QObject::connect(comms, &CommunicationProtocol::gotConsumer, this, &Backend::updateCheckbox);
     //QObject::connect(mythread, SIGNAL(finished()), mythread, SLOT(deleteLater()));
 
@@ -48,6 +49,9 @@ Backend::Backend(QQmlApplicationEngine* newEngine, QThread* newMainThread, QObje
     //removePurchase
     QObject::connect(this, &Backend::getBalanceSignal, comms, &CommunicationProtocol::getBalance);
     QObject::connect(comms, &CommunicationProtocol::gotBalance, this, &Backend::updateSummaryTextbox);
+
+    comms->moveToThread(mythread);
+    mythread->start();
 }
 
 void Backend::setPort(quint16 newPort)
@@ -76,9 +80,8 @@ void Backend::updateUI(){
     else
         qDebug() << "Could not find the date text field. \n";
 
-    comms->moveToThread(mythread);
-
-    mythread->start();
+    emit startGetConsumer();
+    //mythread->start();
     return;
 }
 

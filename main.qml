@@ -15,23 +15,12 @@ ApplicationWindow {
         currentIndex: tabBar.currentIndex
 
         Page1Form {
-            nameField.onTextChanged: {
-                backend.setName(nameField.text)
-            }
+            nameField.onTextChanged: {backend.setName(nameField.text)}
 
-            writeButton.onClicked: {
-                backend.sendPurchase(price.text, nameField.text ,dateText.text, receiverField.text)
-
-            }
-            checkBox.onCheckedChanged: {
-                reverseButton.enabled = checkBox.checkState
-            }
-            reverseButton.onClicked: {
-                backend.removePurchase(nameField.text, dateText.text, receiverField.text)
-            }
-            eatenButton.onClicked: {
-                backend.sendConsumer(nameField.text, dateText.text, 'true')
-            }
+            writeButton.onClicked: {backend.sendPurchase(price.text, nameField.text ,dateText.text, receiverField.text)}
+            checkBox.onCheckedChanged: {reverseButton.enabled = checkBox.checkState}
+            reverseButton.onClicked: {backend.removePurchase(nameField.text, dateText.text, receiverField.text)}
+            eatenButton.onClicked: { backend.sendConsumer(nameField.text, dateText.text, !eatenCheckBox.checked)}
         }
 
         Page2Form {
