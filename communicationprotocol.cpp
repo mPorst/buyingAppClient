@@ -68,7 +68,7 @@ QString CommunicationProtocol::sendPurchase(QString price, QString buyer, QStrin
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit sentPurchase("Server sent \"" + answerFromServer +"\"\n");
+        emit sentPurchase(answerFromServer+" \n");
         return "Server communication error"; // server didn't answer
     }
 
@@ -96,7 +96,7 @@ QString CommunicationProtocol::removePurchase(QString buyer, QString date, QStri
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit removedPurchase("Server sent \"" + answerFromServer +"\"\n");
+        emit removedPurchase("" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -123,7 +123,7 @@ QString CommunicationProtocol::getBalance(QString buyer)
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit gotBalance("Server sent \"" + answerFromServer +"\"\n");
+        emit gotBalance("" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -146,7 +146,7 @@ QString CommunicationProtocol::getSummary()
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit gotSummary("Server sent \"" + answerFromServer +"\"\n");
+        emit gotSummary("" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -187,7 +187,7 @@ QString CommunicationProtocol::sendConsumer(QString consumer, QString date, QStr
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit sentConsumer("Server sent \"" + answerFromServer +"\"\n");
+        emit sentConsumer("" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
@@ -214,7 +214,7 @@ QString CommunicationProtocol::getConsumer(QString consumer, QString date=QDate:
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit gotConsumer("Server sent \"" + answerFromServer +"\"\n");
+        emit gotConsumer("" + answerFromServer +"\"\n");
         return "Can't reach server on regular UI update";
     }
 
@@ -246,7 +246,7 @@ QString CommunicationProtocol::getEaters(QString date)
     {
         qDebug() << "Did not receive confirmation from server, received \"" << answerFromServer << "\" \n";
         closeSocket();
-        emit gotEaters("Server sent \"" + answerFromServer +"\"\n");
+        emit gotEaters("" + answerFromServer +"\"\n");
         return "Server error, did not send data";
     }
 
