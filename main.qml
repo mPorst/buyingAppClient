@@ -4,8 +4,8 @@ import QtQuick.Controls 2.4
 ApplicationWindow {
     objectName: "mainWindow"
     visible: true
-    width: 480
-    height: 640
+    width: 800
+    height: 480
     title: qsTr("buying app")
 
     SwipeView {
@@ -16,6 +16,7 @@ ApplicationWindow {
 
         Page1Form {
             nameField.onTextChanged: {backend.setName(nameField.text)}
+            receiverField.onTextChanged: {backend.updateSendButton(receiverField.text)}
 
             writeButton.onClicked: {backend.sendPurchase(price.text, nameField.text ,dateText.text, receiverField.text)}
             checkBox.onCheckedChanged: {reverseButton.enabled = checkBox.checkState}

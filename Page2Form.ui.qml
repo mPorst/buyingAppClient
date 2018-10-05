@@ -2,8 +2,8 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 Page {
-    width: 400
-    height: 600
+    width: 800
+    height: 480
 
     property alias balanceButton: balanceButton
     property alias summaryButton: summaryButton
@@ -12,6 +12,7 @@ Page {
 
     header: Label {
         text: qsTr("./Übersicht")
+        horizontalAlignment: Text.AlignHCenter
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
     }
@@ -19,52 +20,53 @@ Page {
     Text {
         id: serverAnswerSummary
         objectName: "serverAnswerSummaryObject"
-        x: 14
-        y: 141
-        width: 319
-        height: 243
+        x: 271
+        y: 18
+        width: 433
+        height: 336
         text: qsTr("Serverantwort")
         font.pixelSize: 12
 
-        Flickable
-        {
-        id: flickable
-        anchors.fill: parent
-        flickableDirection: Flickable.VerticalFlick
-
-        TextArea.flickable: TextArea {
-            id: serverAnswerSummaryArea
-            objectName: "serverAnswerSummaryAreaObject"
-            text: qsTr("Text  Area")
-            textFormat: Text.AutoText
-            wrapMode: Text.WordWrap
+        Flickable {
+            id: flickable
+            anchors.bottomMargin: 0
+            anchors.leftMargin: 0
             anchors.fill: parent
-        }
-        ScrollBar.vertical: ScrollBar { }
-        }
+            flickableDirection: Flickable.VerticalFlick
 
+            TextArea.flickable: TextArea {
+                id: serverAnswerSummaryArea
+                objectName: "serverAnswerSummaryAreaObject"
+                text: qsTr("Text  Area")
+                textFormat: Text.AutoText
+                wrapMode: Text.WordWrap
+                anchors.fill: parent
+            }
+            ScrollBar.vertical: ScrollBar {
+            }
+        }
     }
 
     Button {
         id: balanceButton
         objectName: "balanceButtonObject"
-        x: 14
+        x: 74
         y: 18
-        text: "Guthaben"
+        text: "Guthaben anzeigen"
     }
 
     Button {
         id: summaryButton
         objectName: "summaryButtonObject"
-        x: 14
-        y: 78
+        x: 74
+        y: 102
         text: "Zusammenfassung"
     }
 
     Button {
         id: eatersButton
-        x: 192
-        y: 18
-        text: qsTr("gegessen")
+        x: 74
+        y: 190
+        text: qsTr("Wer hat gegessen ?")
     }
 }

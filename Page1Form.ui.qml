@@ -2,8 +2,8 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 Page {
-    width: 400
-    height: 600
+    width: 800
+    height: 480
     property alias serverAnswer: serverAnswer
     property alias writeButton: writeButton
     property alias dateText: dateText
@@ -19,6 +19,7 @@ Page {
     //    property alias dateTextField: dateText.text
     header: Label {
         text: qsTr("./Rechnung hochladen")
+        horizontalAlignment: Text.AlignHCenter
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
     }
@@ -26,7 +27,7 @@ Page {
     TextEdit {
         id: price
         x: 26
-        y: 35
+        y: 55
         width: 210
         height: 32
         color: "#ffffff"
@@ -37,22 +38,23 @@ Page {
 
     Button {
         id: writeButton
-        x: 275
-        y: 120
-        text: qsTr("send")
+        objectName: "writeButtonObject"
+        x: 620
+        y: 55
+        text: qsTr("sende Rechnung")
     }
 
     Label {
         id: label
         x: 26
-        y: 7
+        y: 27
         text: qsTr("Preis")
     }
 
     TextEdit {
         id: nameField
         x: 26
-        y: 101
+        y: 121
         width: 210
         height: 32
         color: "#ffffff"
@@ -64,7 +66,7 @@ Page {
     Label {
         id: label1
         x: 26
-        y: 73
+        y: 93
         text: qsTr("Name")
     }
 
@@ -72,9 +74,9 @@ Page {
         id: serverAnswer
         objectName: "serverAnswerObject"
         x: 26
-        y: 248
-        width: 210
-        height: 168
+        y: 188
+        width: 548
+        height: 165
         color: "#ffffff"
         text: qsTr("")
         textFormat: Text.AutoText
@@ -86,6 +88,9 @@ Page {
             id: serverAnswerArea
             objectName: "serverAnswerAreaObject"
             text: qsTr("Keine")
+            anchors.rightMargin: 0
+            anchors.leftMargin: 0
+            anchors.topMargin: 0
             anchors.bottomMargin: 0
             wrapMode: Text.WordWrap
             anchors.fill: parent
@@ -95,7 +100,7 @@ Page {
     Label {
         id: label2
         x: 26
-        y: 209
+        y: 160
         width: 94
         height: 22
         text: qsTr("Serverantwort")
@@ -104,20 +109,20 @@ Page {
     TextEdit {
         id: dateText
         objectName: "dateTextObject"
-        x: 152
-        y: 32
+        x: 364
+        y: 27
         width: 123
         height: 38
         color: "#00fff0"
-        text: qsTr("Text")
+        text: qsTr("date")
         font.pixelSize: 12
     }
 
     TextEdit {
         id: receiverField
         objectName: "receiverFieldObject"
-        x: 25
-        y: 167
+        x: 364
+        y: 121
         width: 210
         height: 32
         color: "#ffffff"
@@ -128,15 +133,15 @@ Page {
 
     Label {
         id: label4
-        x: 25
-        y: 139
+        x: 364
+        y: 93
         text: qsTr("Empfänger")
     }
 
     Button {
         id: reverseButton
-        x: 26
-        y: 429
+        x: 589
+        y: 321
         text: qsTr("Einkauf rückgängig")
         enabled: false
     }
@@ -144,22 +149,22 @@ Page {
     CheckBox {
         id: checkBox
         objectName: "checkBoxObject"
-        x: 201
-        y: 429
+        x: 589
+        y: 267
         text: qsTr("rückgängig?")
     }
 
     CheckBox {
         id: eatenCheckbox
         objectName: "eatenCheckboxObject"
-        x: 218
-        y: 209
+        x: 580
+        y: 121
     }
 
     Button {
         id: eatenButton
-        x: 258
-        y: 209
+        x: 620
+        y: 121
         text: qsTr("gegessen")
     }
 }

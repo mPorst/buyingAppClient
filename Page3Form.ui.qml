@@ -3,14 +3,15 @@ import QtQuick.Controls 2.4
 
 Page {
     id: page
-    width: 400
-    height: 600
+    width: 800
+    height: 480
     property alias port: port
     property alias host: host
     property alias updateSwitch: updateSwitch
 
     header: Label {
-        text: qsTr("./Connection")
+        text: qsTr("./Verbindungsinformationen")
+        horizontalAlignment: Text.AlignHCenter
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
     }
@@ -30,7 +31,7 @@ Page {
         width: 228
         height: 35
         color: "#ffffff"
-        text: qsTr("palaven.de")
+        text: qsTr("essen.kc.loc")
         font.family: "Times New Roman"
         font.pixelSize: 22
     }

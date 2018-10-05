@@ -43,6 +43,7 @@ public slots:
     void updateCheckbox(QString value);
     void updateMainTextbox(QString text);
     void updateSummaryTextbox(QString text);
+    void updateSendButton(QString text);
 
     void dummyFunction();
 
@@ -65,8 +66,9 @@ private:
     QObject* qmlRootObject;
     bool initialised;
     quint16 port=39978;
-    QString domain="palaven.de";
+    QString domain="essen.kc.loc";
     QString name = "Max Mustermann";
+    QString _recv = "None";
     QString date;
     CommunicationProtocol* comms;
     QThread* mainThread;

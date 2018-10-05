@@ -8,7 +8,6 @@ Backend::Backend(QQmlApplicationEngine* newEngine, QThread* newMainThread, QObje
 
     // timer to update UI constantly
     timer = new QTimer(this);
-    //connect(timer, &QTimer::timeout, this, &Backend::updateUI);
     //connect(timer, &QTimer::timeout, mythread, &QThread::start);
     timer->start(2000);
 
@@ -86,6 +85,18 @@ void Backend::updateUI(){
     emit startGetConsumer();
     //mythread->start();
     return;
+}
+
+void Backend::updateSendButton(QString text)
+{
+    QObject *writeButton = qmlRootObject->findChild<QObject*>("writeButtonObject");
+    if(writeButton != nullptr)
+        if(text != "none")
+            writeButton->setProperty("text", "sende Transaktion");
+        else
+            writeButton->setProperty("text", "sende Rechnung");
+    else
+        qDebug() << "Could not find the date text field. \n";
 }
 
 bool Backend::sendPurchase(QString price, QString buyer, QString date, QString receiver)
@@ -206,6 +217,7 @@ void Backend::switchUpdate(bool value)
 void Backend::getEaters()
 {
     emit getEatersSignal(date);
+    updateSummaryTextbox("Updating");
 }
 
 void Backend::setDate(QString newDate)
